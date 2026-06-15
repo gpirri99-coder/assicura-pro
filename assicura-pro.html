@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#1A2540"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Assicura Pro"/>
+
+<title>Assicura Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--ink:#1A2540;--cobalt:#2D4A8A;--gold:#C49A3C;--amber:#F0A500;--cream:#F7F4EE;--paper:#fff;--steel:#6B7A99;--mint:#2E8B6E;--border:#DDD8CE;--danger:#C0392B}
+html,body{height:100%;overflow:hidden;background:var(--cream);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink)}
+#app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;background:var(--cream)}
+#statusbar{background:var(--ink);padding:calc(env(safe-area-inset-top,0px) + 10px) 18px 10px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.logo{background:var(--gold);border-radius:8px;padding:2px 10px;font-size:10px;font-weight:800;color:var(--ink);letter-spacing:.8px}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+#nav{background:var(--paper);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(7,1fr);padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));flex-shrink:0}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 1px;position:relative}
+.ni-icon{font-size:17px;transition:transform .15s}
+.ni-label{font-size:8px;font-weight:700;letter-spacing:.3px;color:var(--steel)}
+.ni.active .ni-label{color:var(--cobalt)}
+.ni-dot{width:4px;height:4px;border-radius:50%;background:var(--cobalt);margin-top:1px}
+.badge-n{position:absolute;top:0;right:3px;background:var(--danger);color:#fff;border-radius:50%;width:14px;height:14px;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.screen{display:none;padding:0 16px 24px}
+.screen.active{display:block}
+.stitle{font-size:20px;font-weight:800;color:var(--ink);padding:18px 0 14px}
+.card{background:var(--paper);border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(26,37,64,.07);border:1px solid var(--border);margin-bottom:12px}
+.sectitle{font-size:10px;font-weight:800;letter-spacing:1.2px;color:var(--steel);text-transform:uppercase;margin-bottom:12px}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;border-radius:4px;padding:2px 8px;text-transform:uppercase}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.kpi-box{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer}
+.kpi-n{font-size:26px;font-weight:900;line-height:1}
+.kpi-l{font-size:9px;color:var(--steel);font-weight:600;margin-top:3px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid var(--border);background:var(--cream);color:var(--steel);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;color:var(--steel);letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:6px}
+.form-input{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--cream);font-size:14px;color:var(--ink);outline:none;font-family:inherit;box-sizing:border-box}
+.form-input:focus{border-color:var(--cobalt)}
+select.form-input{appearance:none;-webkit-appearance:none}
+.btn-primary{width:100%;background:var(--cobalt);color:#fff;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;box-shadow:0 4px 16px rgba(45,74,138,.3)}
+.btn-secondary{width:100%;background:transparent;color:var(--cobalt);border:1.5px solid var(--cobalt);border-radius:14px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px}
+#overlay{display:none;position:fixed;inset:0;background:rgba(26,37,64,.55);z-index:100;align-items:flex-end;justify-content:center}
+#overlay.open{display:flex}
+#modal{background:var(--paper);border-radius:22px 22px 0 0;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:20px 20px 36px;animation:su .22s ease}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:18px}
+#confirm-overlay{display:none;position:fixed;inset:0;background:rgba(26,37,64,.6);z-index:200;align-items:center;justify-content:center;padding:24px}
+#confirm-overlay.open{display:flex}
+#confirm-box{background:var(--paper);border-radius:18px;padding:24px;max-width:300px;width:100%}
+#confirm-msg{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:20px;line-height:1.4}
+.confirm-btns{display:flex;gap:10px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:36px 20px}
+.empty-icon{font-size:42px;margin-bottom:12px}
+.empty-text{font-size:14px;color:var(--steel);margin-bottom:16px;line-height:1.5}
+.trash-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:14px;color:var(--steel);flex-shrink:0}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+/* polizza card */
+.pol-card{background:var(--paper);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px}
+/* datepicker */
+.dp-modes{display:flex;gap:6px;margin-bottom:8px}
+.dp-mode{font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;font-weight:700;border:1px solid var(--border);background:var(--cream);color:var(--steel)}
+.dp-mode.active{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.dp-selects{display:flex;gap:6px}
+.dp-sel{flex:1;padding:9px 6px;border-radius:9px;border:1px solid var(--border);background:var(--cream);font-size:13px;color:var(--ink);outline:none;font-family:inherit;appearance:none;-webkit-appearance:none;text-align:center;cursor:pointer}
+.dp-preview{font-size:11px;color:var(--mint);margin-top:5px;font-weight:600}
+/* week */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+.wday{text-align:center}
+.wday-lbl{font-size:9px;color:var(--steel);margin-bottom:4px;font-weight:600}
+.wday-num{width:32px;height:32px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:1px solid var(--border)}
+.wday-num.today{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+/* task */
+.task-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.task-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.task-check.done{background:var(--mint);border-color:var(--mint)}
+/* news */
+.news-fonte{background:var(--paper);border-radius:14px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden}
+.toggle-wrap{width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle-knob{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+/* settings */
+.sec-head{font-size:12px;font-weight:800;letter-spacing:.8px;color:var(--cobalt);text-transform:uppercase;margin-bottom:12px;margin-top:20px;padding-bottom:6px;border-bottom:2px solid var(--cobalt)}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+</style>
+<script>
+(function(){
+// Crea icona tramite Canvas (unico metodo che funziona su Chrome Android senza hosting)
+var img = new Image();
+img.onload = function(){
+  // Canvas 192x192
+  var c192 = document.createElement('canvas'); c192.width=192; c192.height=192;
+  var ctx192 = c192.getContext('2d');
+  // Sfondo blu
+  ctx192.fillStyle='#1A2540'; ctx192.fillRect(0,0,192,192);
+  // Foto centrata
+  ctx192.drawImage(img,0,0,192,192);
+  var url192 = c192.toDataURL('image/jpeg',0.85);
+
+  // Canvas 512x512
+  var c512 = document.createElement('canvas'); c512.width=512; c512.height=512;
+  var ctx512 = c512.getContext('2d');
+  ctx512.fillStyle='#1A2540'; ctx512.fillRect(0,0,512,512);
+  ctx512.drawImage(img,0,0,512,512);
+  var url512 = c512.toDataURL('image/jpeg',0.80);
+
+  // Manifest con icone canvas
+  var mf = {
+    name:"Assicura Pro",
+    short_name:"Assicura Pro",
+    start_url:location.href,
+    display:"standalone",
+    background_color:"#1A2540",
+    theme_color:"#1A2540",
+    orientation:"portrait-primary",
+    icons:[
+      {src:url192, sizes:"192x192", type:"image/jpeg", purpose:"any"},
+      {src:url512, sizes:"512x512", type:"image/jpeg", purpose:"any maskable"}
+    ]
+  };
+  var blob = new Blob([JSON.stringify(mf)],{type:"application/json"});
+  var mlink = document.querySelector('link[rel="manifest"]');
+  if(!mlink){ mlink=document.createElement('link'); mlink.rel='manifest'; document.head.appendChild(mlink); }
+  mlink.href = URL.createObjectURL(blob);
+
+  // Apple touch icon per iOS
+  var alink = document.createElement('link');
+  alink.rel='apple-touch-icon'; alink.href=url192;
+  document.head.appendChild(alink);
+
+  // Favicon
+  var flink = document.createElement('link');
+  flink.rel='icon'; flink.type='image/jpeg'; flink.href=url192;
+  document.head.appendChild(flink);
+};
+img.src = 'data:image/jpeg;base64,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';
+
+// Service Worker minimale
+if('serviceWorker' in navigator){
+  var sw = [
+    "var C='apv4';",
+    "self.addEventListener('install',function(e){self.skipWaiting();});",
+    "self.addEventListener('activate',function(e){e.waitUntil(clients.claim());});",
+    "self.addEventListener('fetch',function(e){",
+    "  if(e.request.mode==='navigate'){",
+    "    e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request);}));",
+    "  }",
+    "});"
+  ].join('\n');
+  var swblob = new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swblob)).catch(function(){});
+}
+})();
+</script>
+</head>
+<body>
+<div id="app">
+  <div id="statusbar">
+    <span id="clock" style="color:#fff;font-size:13px;font-weight:700"></span>
+    <span class="logo">ASSICURA PRO</span>
+    <span style="color:#fff;font-size:12px">📶 🔋</span>
+  </div>
+  <div id="content">
+    <!-- HOME -->
+    <div class="screen active" id="s0">
+      <div style="padding:18px 0 14px">
+        <div style="font-size:12px;color:var(--steel);margin-bottom:2px" id="h-date"></div>
+        <div style="font-size:22px;font-weight:800;line-height:1.2">Buongiorno, <span id="h-name" style="color:var(--cobalt)">Giuseppe</span> 👋</div>
+      </div>
+      <div class="kpi-grid" id="h-kpi"></div>
+      <div class="card" id="h-appts-card">
+        <div class="sectitle">Prossimi appuntamenti</div>
+        <div id="h-appts"></div>
+        <div onclick="goTo(1)" style="font-size:12px;color:var(--cobalt);font-weight:700;text-align:center;padding-top:4px;cursor:pointer" id="h-appts-link">Vedi tutti →</div>
+      </div>
+      <div class="card" id="h-pol-card" style="display:none;border-left:3px solid var(--danger)">
+        <div class="sectitle">⚠️ Polizze in scadenza</div>
+        <div id="h-pol"></div>
+        <div onclick="goTo(4)" style="font-size:12px;color:var(--cobalt);font-weight:700;margin-top:8px;cursor:pointer;text-align:center">Gestisci polizze →</div>
+      </div>
+      <div class="card" id="h-dead-card" style="display:none">
+        <div class="sectitle">🗓 Scadenze urgenti</div>
+        <div id="h-dead"></div>
+      </div>
+      <div class="card">
+        <div class="sectitle">📰 News di settore</div>
+        <div id="h-news"></div>
+        <div onclick="goTo(5)" style="font-size:12px;color:var(--cobalt);font-weight:700;cursor:pointer;margin-top:8px">Vai alle News →</div>
+      </div>
+    </div>
+    <!-- CALENDARIO -->
+    <div class="screen" id="s1">
+      <div class="stitle">📅 Calendario</div>
+      <div class="week-strip" id="week-strip"></div>
+      <div class="sectitle">Appuntamenti di oggi</div>
+      <div id="cal-list"></div>
+      <button class="btn-primary" id="cal-add-btn" onclick="openModal('appt')" style="display:none">+ Nuovo appuntamento</button>
+    </div>
+    <!-- IMPEGNI -->
+    <div class="screen" id="s2">
+      <div class="stitle">✅ Impegni</div>
+      <div id="task-kpi" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;display:none"></div>
+      <div class="tabs" id="task-tabs" style="display:none">
+        <div class="tab active" onclick="taskFilter('tutti',this)">Tutti</div>
+        <div class="tab" onclick="taskFilter('attivi',this)">Attivi</div>
+        <div class="tab" onclick="taskFilter('completati',this)">Completati</div>
+      </div>
+      <div id="task-list"></div>
+      <button class="btn-primary" id="task-add-btn" onclick="openModal('task')" style="display:none">+ Nuova attività</button>
+    </div>
+    <!-- SCADENZE -->
+    <div class="screen" id="s3">
+      <div class="stitle">🗓 Scadenze</div>
+      <div class="tabs" id="dead-tabs" style="display:none">
+        <div class="tab active" data-df="tutti" onclick="deadFilter('tutti',this)">Tutti</div>
+        <div class="tab" data-df="rinnovo" onclick="deadFilter('rinnovo',this)">Rinnovi</div>
+        <div class="tab" data-df="preventivo" onclick="deadFilter('preventivo',this)">Preventivi</div>
+        <div class="tab" data-df="normativa" onclick="deadFilter('normativa',this)">Normativa</div>
+        <div class="tab" data-df="pratica" onclick="deadFilter('pratica',this)">Pratiche</div>
+      </div>
+      <div id="dead-list"></div>
+      <button class="btn-primary" id="dead-add-btn" onclick="openModal('dead')" style="display:none">+ Nuova scadenza</button>
+    </div>
+    <!-- POLIZZE -->
+    <div class="screen" id="s4">
+      <div class="stitle">🛡 Le Mie Polizze</div>
+      <div class="tabs" id="pol-tabs" style="display:none">
+        <div class="tab active" onclick="polFilter('tutte',this)">Tutte</div>
+        <div class="tab" onclick="polFilter('auto',this)">🚗 Auto</div>
+        <div class="tab" onclick="polFilter('vita',this)">💚 Vita</div>
+        <div class="tab" onclick="polFilter('casa',this)">🏠 Casa</div>
+        <div class="tab" onclick="polFilter('altro',this)">📋 Altro</div>
+      </div>
+      <div id="pol-list"></div>
+      <button class="btn-primary" id="pol-add-btn" onclick="openModal('pol')" style="display:none">+ Aggiungi polizza</button>
+    </div>
+    <!-- NEWS -->
+    <div class="screen" id="s5">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 0 10px">
+        <div class="stitle" style="padding:0;margin:0">📰 News</div>
+        <button id="news-refresh-btn" onclick="fetchNews(true)"
+          style="background:var(--cobalt);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
+          🔄 Aggiorna
+        </button>
+      </div>
+      <div id="news-last-update" style="font-size:11px;color:var(--steel);margin-bottom:12px"></div>
+      <div class="tabs">
+        <div class="tab active" onclick="newsFilter('Tutti',this)">Tutti</div>
+        <div class="tab" onclick="newsFilter('Salvate',this)">⭐ Salvate</div>
+      </div>
+      <div id="news-list"></div>
+    </div>
+    <!-- PROFILO -->
+    <div class="screen" id="s6">
+      <div class="stitle">⚙️ Impostazioni</div>
+      <div class="card" style="text-align:center;margin-bottom:4px">
+        <div id="prof-avatar" style="width:72px;height:72px;border-radius:50%;background:var(--cobalt);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 10px">G</div>
+        <div id="prof-name" style="font-size:18px;font-weight:800;color:var(--ink)">Il tuo nome</div>
+        <div id="prof-role" style="font-size:12px;color:var(--steel);margin-top:2px">Agente di Assicurazione</div>
+        <div id="prof-rui" style="font-size:11px;color:var(--cobalt);margin-top:4px;font-weight:700"></div>
+      </div>
+      <div class="sec-head">Dati Anagrafici</div>
+      <div class="form-group"><label class="form-label">Nome</label><input class="form-input" id="p-nome" placeholder="Il tuo nome" oninput="updateProfilePreview()"/></div>
+      <div class="form-group"><label class="form-label">Cognome</label><input class="form-input" id="p-cognome" placeholder="Il tuo cognome" oninput="updateProfilePreview()"/></div>
+      <div class="form-group" id="dp-dob-wrap"><label class="form-label">Data di Nascita</label></div>
+      <div class="form-group"><label class="form-label">Luogo di Nascita</label><input class="form-input" id="p-lob" placeholder="Es. Milano (MI)"/></div>
+      <div class="form-group"><label class="form-label">Codice Fiscale</label><input class="form-input" id="p-cf" placeholder="RSSGPP80A01F205X" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="sec-head">Dati Professionali</div>
+      <div class="form-group"><label class="form-label">Partita IVA</label><input class="form-input" id="p-piva" placeholder="01234567890"/></div>
+      <div class="form-group"><label class="form-label">N. Iscrizione RUI</label><input class="form-input" id="p-rui" placeholder="Es. A000012345" oninput="updateProfilePreview()"/></div>
+      <div class="form-group"><label class="form-label">Sezione RUI</label>
+        <select class="form-input" id="p-ruisez" onchange="updateProfilePreview()">
+          <option value="">Seleziona...</option>
+          <option value="A">Sezione A – Agenti</option>
+          <option value="B">Sezione B – Mediatori (Broker)</option>
+          <option value="C">Sezione C – Produttori diretti</option>
+          <option value="D">Sezione D – Addetti operanti</option>
+          <option value="E">Sezione E – Periti assicurativi</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Qualifica</label><input class="form-input" id="p-role" placeholder="Es. Agente di Assicurazione" oninput="updateProfilePreview()"/></div>
+      <div class="form-group"><label class="form-label">Agenzia / Compagnia</label><input class="form-input" id="p-agenzia" placeholder="Es. Generali Italia S.p.A."/></div>
+      <div class="form-group"><label class="form-label">N. Mandato</label><input class="form-input" id="p-mandato" placeholder="Es. MAN-2024-001"/></div>
+      <div class="sec-head">Contatti</div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="p-email" placeholder="nome@agenzia.it"/></div>
+      <div class="form-group"><label class="form-label">Telefono</label><input class="form-input" type="tel" id="p-tel" placeholder="+39 333 0000000"/></div>
+      <div class="form-group"><label class="form-label">Indirizzo ufficio</label><input class="form-input" id="p-addr" placeholder="Via Roma 1, 20100 Milano"/></div>
+      <div class="sec-head">Notifiche Polizze</div>
+      <div class="toggle-row">
+        <div><div style="font-size:14px;font-weight:600">Avviso 30 giorni prima</div><div style="font-size:11px;color:var(--steel)">Scadenze polizze e rinnovi</div></div>
+        <div class="toggle-wrap" id="tog-30" style="background:var(--cobalt)" onclick="toggleNotif('tog-30')"><div class="toggle-knob" style="left:22px"></div></div>
+      </div>
+      <div class="toggle-row" style="border-bottom:none">
+        <div><div style="font-size:14px;font-weight:600">Avviso 7 giorni prima</div><div style="font-size:11px;color:var(--steel)">Promemoria urgente</div></div>
+        <div class="toggle-wrap" id="tog-7" style="background:var(--cobalt)" onclick="toggleNotif('tog-7')"><div class="toggle-knob" style="left:22px"></div></div>
+      </div>
+      <button class="btn-primary" onclick="saveProfile()" style="margin-top:20px">Salva impostazioni</button>
+      <div style="height:24px"></div>
+    </div>
+  </div>
+  <div id="nav"></div>
+</div>
+
+<div id="overlay" onclick="closeModalOutside(event)">
+  <div id="modal"><div class="modal-handle"></div><div id="modal-content"></div></div>
+</div>
+<div id="confirm-overlay">
+  <div id="confirm-box">
+    <div id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button onclick="closeConfirm()" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-size:14px;font-weight:700;cursor:pointer;color:var(--steel)">Annulla</button>
+      <button id="confirm-yes" style="flex:1;padding:12px;border-radius:10px;border:none;background:var(--danger);color:#fff;font-size:14px;font-weight:700;cursor:pointer">Elimina</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ───────────────────────────────────────────────
+// ── PERSISTENZA localStorage ───────────────────────────
+function lsGet(k,def){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):def;}catch(e){return def;}}
+function lsSave(){
+  try{
+    localStorage.setItem('ap_appts',JSON.stringify(appts));
+    localStorage.setItem('ap_tasks',JSON.stringify(tasks));
+    localStorage.setItem('ap_deadlines',JSON.stringify(deadlines));
+    localStorage.setItem('ap_polizze',JSON.stringify(polizze));
+    localStorage.setItem('ap_savedNews',JSON.stringify(savedNews));
+    localStorage.setItem('ap_profile',JSON.stringify(profile));
+  }catch(e){}
+}
+
+let appts=lsGet('ap_appts',[]);
+let tasks=lsGet('ap_tasks',[]);
+let deadlines=lsGet('ap_deadlines',[]);
+let polizze=lsGet('ap_polizze',[]);
+let savedNews=lsGet('ap_savedNews',[]);
+let profile=lsGet('ap_profile',{nome:'Giuseppe',cognome:'',dob:'',lob:'',cf:'',piva:'',rui:'',ruiSez:'',role:'Agente di Assicurazione',agenzia:'',mandato:'',email:'',tel:'',addr:''});
+let curTab=0, taskF='tutti', deadF='tutti', polF='tutte', newsF='Tutti';
+let confirmCb=null, polEditId=null;
+
+// ── FONTI NEWS ─────────────────────────────────────────
+const FONTI=[
+  {id:'f1',icon:'📋',nome:'Assinews — 11 giu 2026',tag:'Mercato',color:'#2D4A8A',
+   desc:'Rassegna stampa assicurativa quotidiana dai principali quotidiani nazionali',
+   aggiornato:'11 giu 2026',url:'https://www.assinews.it/06/2026/rassegna-stampa-assicurativa-11-giugno-2026/660123053/',
+   titoli:['Nel Risiko bancario va tutelato il risparmio degli italiani','Emergenza clima, a rischio la mutualità nelle cooperative','Polizza catastrofale obbligatoria per accedere al bando Inail Isi 2025']},
+  {id:'f2',icon:'⚖️',nome:'IVASS — Comunicati',tag:'Normativa',color:'#C0392B',
+   desc:"Comunicati ufficiali dell'Istituto per la Vigilanza sulle Assicurazioni",
+   aggiornato:'10 giu 2026',url:'https://www.ivass.it/media/comunicati/index.html',
+   titoli:["IVASS ordina l'oscuramento di 2 siti internet abusivi","Elite Insurance Company Limited: piano di riorganizzazione","In pubblica consultazione modifiche al Regolamento IVASS 55/2024"]},
+  {id:'f3',icon:'📋',nome:'Assinews — 8 giu 2026',tag:'Mercato',color:'#2D4A8A',
+   desc:'Insurtech, responsabilità civile, normativa UE sulle insolvenze',
+   aggiornato:'8 giu 2026',url:'https://www.assinews.it/06/2026/rassegna-stampa-assicurativa-8-giugno-2026/660122965/',
+   titoli:['Insurtech, verso il miliardo e mezzo di raccolta','Insolvenze, la nuova normativa UE entra in vigore','Il disegno del nuovo assicuratore tra alleanze e operazioni rapide']},
+  {id:'f4',icon:'📊',nome:'ANIA — Dati mercato',tag:'Mercato',color:'#2E8B6E',
+   desc:"Aggiornamenti e statistiche dell'Associazione Nazionale Imprese Assicuratrici",
+   aggiornato:'giu 2026',url:'https://www.ania.it/',
+   titoli:['Incremento del premio medio RC Auto a marzo 2026','In Italia +20% le polizze M&A contro i rischi fiscali','Auto elettriche: quota all\'8,5% in Italia']},
+  {id:'f5',icon:'📋',nome:'Assinews — 4 giu 2026',tag:'Trend',color:'#C49A3C',
+   desc:'Welfare, sicurezza sul lavoro, non autosufficienza',
+   aggiornato:'4 giu 2026',url:'https://www.assinews.it/06/2026/rassegna-stampa-assicurativa-4-giugno-2026/660122993/',
+   titoli:['Aon, broker ad alta redditività: i risultati del trimestre','In arrivo tre miliardi per la non autosufficienza','Taglio premi INAIL del 7% per aziende senza infortuni']},
+  {id:'f6',icon:'⚖️',nome:'IVASS — Bollettino Statistico',tag:'Normativa',color:'#C0392B',
+   desc:'Bollettino XIII/1: attività assicurativa nel comparto salute 2019–2024',
+   aggiornato:'gen 2026',url:'https://www.ivass.it/pubblicazioni-e-statistiche/statistiche/bollettino-statistico/',
+   titoli:['Comparto salute 2019–2024: analisi attività assicurativa','Mercato vita italiano: bollettino XII/4','RC generale e sanitaria: bollettino XII/3']},
+];
+
+// ── UTILS ──────────────────────────────────────────────
+const TODAY=new Date(); TODAY.setHours(0,0,0,0);
+const daysLeft=s=>{if(!s)return 999;const d=new Date(s);d.setHours(0,0,0,0);return Math.ceil((d-TODAY)/86400000)};
+const fmtDate=s=>{if(!s)return'—';return new Date(s+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'})};
+const urgColor=n=>n<=7?'var(--danger)':n<=30?'var(--amber)':'var(--mint)';
+const nextId=arr=>arr.length?Math.max(...arr.map(x=>x.id))+1:1;
+const FL={annuale:'Annuale',semestrale:'Semestrale (×2)',trimestrale:'Trimestrale (×4)',mensile:'Mensile (×12)'};
+const FD={annuale:1,semestrale:2,trimestrale:4,mensile:12};
+const PI={auto:'🚗',vita:'💚',casa:'🏠',altro:'📋'};
+const DI={rinnovo:'🔄',preventivo:'📋',normativa:'⚖️',pratica:'📁'};
+const MESI=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const badge=(label,color)=>`<span class="badge" style="background:${color}18;color:${color};border:1px solid ${color}40">${label}</span>`;
+const TC={Normativa:'#2D4A8A',Mercato:'#2E8B6E',Trend:'#C49A3C'};
+
+// ── DATEPICKER ─────────────────────────────────────────
+function dpDays(m,a){if(!m||!a)return 31;return new Date(parseInt(a),parseInt(m),0).getDate()}
+function dpHtml(id,value,minYear,maxYear){
+  const now=new Date();
+  const myMax=maxYear||now.getFullYear()+20;
+  const myMin=minYear||1930;
+  let g='',mo='',a='';
+  if(value){const[ay,am,ag]=value.split('-');g=ag?String(parseInt(ag)):'';mo=am?String(parseInt(am)):'';a=ay||'';}
+  const maxD=dpDays(mo,a);
+  let dOpts='<option value="">GG</option>';
+  for(let i=1;i<=maxD;i++) dOpts+=`<option value="${i}"${g==i?' selected':''}>${i}</option>`;
+  let mOpts='<option value="">Mese</option>';
+  MESI.forEach((m,i)=>mOpts+=`<option value="${i+1}"${mo==i+1?' selected':''}>${m}</option>`);
+  let yOpts='<option value="">Anno</option>';
+  for(let y=myMax;y>=myMin;y--) yOpts+=`<option value="${y}"${a==y?' selected':''}>${y}</option>`;
+  const prev=value?`<div class="dp-preview">✓ ${new Date(value+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})}</div>`:'';
+  return `<div id="dp-${id}">
+    <div class="dp-modes">
+      <div class="dp-mode active" onclick="dpMode('${id}','sel',this)">Seleziona</div>
+      <div class="dp-mode" onclick="dpMode('${id}','dig',this)">Digita</div>
+    </div>
+    <div id="dp-${id}-sel" class="dp-selects">
+      <select class="dp-sel" id="dp-${id}-g" onchange="dpChange('${id}')">${dOpts}</select>
+      <select class="dp-sel" id="dp-${id}-m" style="flex:2" onchange="dpChange('${id}')">${mOpts}</select>
+      <select class="dp-sel" id="dp-${id}-a" style="flex:1.5" onchange="dpChange('${id}')">${yOpts}</select>
+    </div>
+    <div id="dp-${id}-dig" style="display:none">
+      <input class="form-input" placeholder="gg/mm/aaaa" value="" oninput="dpManual('${id}',this.value)"/>
+    </div>
+    <div id="dp-${id}-prev">${prev}</div>
+    <input type="hidden" id="dp-${id}-val" value="${value||''}"/>
+  </div>`;
+}
+function dpMode(id,mode,el){
+  el.parentElement.querySelectorAll('.dp-mode').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dp-'+id+'-sel').style.display=mode==='sel'?'flex':'none';
+  document.getElementById('dp-'+id+'-dig').style.display=mode==='dig'?'block':'none';
+}
+function dpChange(id){
+  const g=document.getElementById('dp-'+id+'-g').value;
+  const m=document.getElementById('dp-'+id+'-m').value;
+  const a=document.getElementById('dp-'+id+'-a').value;
+  // update day options if month/year changed
+  const maxD=dpDays(m,a);
+  const gSel=document.getElementById('dp-'+id+'-g');
+  const curG=parseInt(gSel.value)||1;
+  let opts='<option value="">GG</option>';
+  for(let i=1;i<=maxD;i++) opts+=`<option value="${i}"${i===curG?' selected':''}>${i}</option>`;
+  gSel.innerHTML=opts;
+  const iso=(g&&m&&a&&a.length===4)?a+'-'+String(m).padStart(2,'0')+'-'+String(g).padStart(2,'0'):'';
+  document.getElementById('dp-'+id+'-val').value=iso;
+  document.getElementById('dp-'+id+'-prev').innerHTML=iso?`<div class="dp-preview">✓ ${new Date(iso+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})}</div>`:'';
+}
+function dpManual(id,v){
+  const sl=v.split('/'); const ds=v.split('-');
+  let iso='';
+  if(sl.length===3&&sl[2].length===4) iso=sl[2]+'-'+sl[1].padStart(2,'0')+'-'+sl[0].padStart(2,'0');
+  else if(ds.length===3&&ds[0].length===4) iso=v;
+  document.getElementById('dp-'+id+'-val').value=iso;
+  document.getElementById('dp-'+id+'-prev').innerHTML=iso?`<div class="dp-preview">✓ ${new Date(iso+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})}</div>`:'';
+}
+function dpGet(id){return document.getElementById('dp-'+id+'-val').value;}
+
+// ── CLOCK ──────────────────────────────────────────────
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});}
+tick(); setInterval(tick,30000);
+document.getElementById('h-date').textContent=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── NAVIGATION ─────────────────────────────────────────
+const NAVDEF=[
+  {icon:'🏠',label:'Home'},{icon:'📅',label:'Calendario'},{icon:'✅',label:'Impegni'},
+  {icon:'🗓',label:'Scadenze'},{icon:'🛡',label:'Polizze'},{icon:'📰',label:'News'},{icon:'⚙️',label:'Profilo'}
+];
+function buildNav(){
+  const urgN=polizze.filter(p=>{const dl=daysLeft(p.scadenza);return dl>=0&&dl<=30}).length;
+  document.getElementById('nav').innerHTML=NAVDEF.map((n,i)=>`
+    <div class="ni${curTab===i?' active':''}" onclick="goTo(${i})">
+      <span class="ni-icon" style="${curTab===i?'':'filter:grayscale(1) opacity(.4)'}">${n.icon}</span>
+      <span class="ni-label">${n.label}</span>
+      ${curTab===i?'<div class="ni-dot"></div>':''}
+      ${i===4&&urgN>0?`<div class="badge-n">${urgN}</div>`:''}
+    </div>`).join('');
+}
+function goTo(i){
+  document.querySelectorAll('.screen').forEach((s,idx)=>s.classList.toggle('active',idx===i));
+  curTab=i; buildNav();
+  if(i===0) renderHome();
+  if(i===1) renderCal();
+  if(i===2) renderTasks();
+  if(i===3) renderDead();
+  if(i===4) renderPol();
+  if(i===5) renderNews();
+  if(i===6) renderSettings();
+}
+
+// ── TOAST ──────────────────────────────────────────────
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── CONFIRM ────────────────────────────────────────────
+function showConfirm(msg,cb){
+  document.getElementById('confirm-msg').textContent=msg;
+  document.getElementById('confirm-yes').onclick=()=>{cb();closeConfirm();};
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');}
+
+// ── MODAL ──────────────────────────────────────────────
+function openModal(type,data){
+  const c=document.getElementById('modal-content');
+  if(type==='appt') c.innerHTML=modalAppt();
+  else if(type==='task') c.innerHTML=modalTask();
+  else if(type==='dead') c.innerHTML=modalDead();
+  else if(type==='pol') c.innerHTML=modalPol(data);
+  document.getElementById('overlay').classList.add('open');
+  // inject datepicker
+  if(type==='pol'){
+    const minY=new Date().getFullYear();
+    const wrap=document.getElementById('dp-scad-wrap');
+    if(wrap) wrap.innerHTML='<label class="form-label">Data scadenza *</label>'+dpHtml('scad',data?data.scadenza:'',minY,minY+30);
+  }
+  if(type==='appt'){
+    const today=new Date().toISOString().slice(0,10);
+    const wrap=document.getElementById('dp-appt-wrap');
+    if(wrap) wrap.innerHTML='<label class="form-label">Data *</label>'+dpHtml('appt',today,new Date().getFullYear(),new Date().getFullYear()+2);
+  }
+}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('overlay'))closeModal();}
+
+// ── HOME ───────────────────────────────────────────────
+function renderHome(){
+  document.getElementById('h-name').textContent=profile.nome||'Giuseppe';
+  const urgPol=polizze.filter(p=>{const dl=daysLeft(p.scadenza);return dl>=0&&dl<=30});
+  const urgDead=deadlines.filter(d=>d.days<=7);
+  const open=tasks.filter(t=>!t.done).length;
+  // KPI
+  document.getElementById('h-kpi').innerHTML=`
+    <div class="kpi-box" onclick="goTo(1)"><div class="kpi-n" style="color:var(--cobalt)">${appts.length}</div><div class="kpi-l">Appuntamenti</div></div>
+    <div class="kpi-box" onclick="goTo(2)"><div class="kpi-n" style="color:var(--gold)">${open}</div><div class="kpi-l">Attività aperte</div></div>
+    <div class="kpi-box" onclick="goTo(4)"><div class="kpi-n" style="color:var(--danger)">${urgPol.length}</div><div class="kpi-l">Polizze urg.</div></div>`;
+  // Appuntamenti
+  if(appts.length===0){
+    document.getElementById('h-appts').innerHTML='<div style="font-size:13px;color:var(--steel);text-align:center;padding:10px 0">Nessun appuntamento</div>';
+    document.getElementById('h-appts-link').textContent='+ Aggiungi →';
+  } else {
+    document.getElementById('h-appts').innerHTML=appts.slice(0,3).map(a=>{
+      const fmtD = a.data ? new Date(a.data+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short'}) : '';
+      return `<div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)">
+        <div style="background:rgba(45,74,138,.12);color:var(--cobalt);border-radius:8px;padding:7px 8px;font-weight:800;font-size:12px;min-width:52px;text-align:center;line-height:1.4">
+          ${a.time}${fmtD?`<br/><span style="font-size:10px;font-weight:600;color:var(--steel)">${fmtD}</span>`:''}
+        </div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">${a.client}</div><div style="font-size:12px;color:var(--steel)">${a.type}</div></div>
+        <span class="dot" style="background:${a.status==='confermato'?'var(--mint)':'var(--gold)'}"></span>
+      </div>`;}).join('');
+    document.getElementById('h-appts-link').textContent='Vedi tutti →';
+  }
+  // Polizze urgenti
+  const pc=document.getElementById('h-pol-card');
+  if(urgPol.length===0){pc.style.display='none';}
+  else{
+    pc.style.display='block';
+    document.getElementById('h-pol').innerHTML=urgPol.map(p=>{
+      const dl=daysLeft(p.scadenza);
+      return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><div style="font-size:13px;font-weight:700">${PI[p.tipo]} ${p.compagnia}</div><div style="font-size:11px;color:var(--steel)">${p.numero}</div></div>
+        ${badge(dl<=0?'SCADUTA':dl===1?'DOMANI':'tra '+dl+' gg',dl<=7?'var(--danger)':'var(--amber)')}
+      </div>`;}).join('');
+  }
+  // Scadenze urgenti
+  const dc=document.getElementById('h-dead-card');
+  if(urgDead.length===0){dc.style.display='none';}
+  else{
+    dc.style.display='block';
+    document.getElementById('h-dead').innerHTML=urgDead.map(d=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:13px;flex:1">${d.label}</div>
+        ${badge('tra '+d.days+' gg','var(--danger)')}
+      </div>`).join('');
+  }
+  // News
+  const hn=document.getElementById('h-news');
+  if(savedNews.length>0){
+    hn.innerHTML=savedNews.slice(0,2).map(f=>`
+      <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+          <span>${f.icon}</span>${badge(f.tag,f.color)}
+        </div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px">${f.titoli[0]}</div>
+        <div style="font-size:11px;color:var(--steel)">${f.nome}</div>
+      </div>`).join('');
+  } else {
+    hn.innerHTML='<div style="font-size:13px;color:var(--steel);line-height:1.5">Aggiornamenti da IVASS, ANIA e Assinews nella sezione News.</div>';
+  }
+}
+
+// ── CALENDARIO ─────────────────────────────────────────
+function renderCal(){
+  const days=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+  const ti=(new Date().getDay()+6)%7;
+  document.getElementById('week-strip').innerHTML=days.map((d,i)=>{
+    const dd=new Date(TODAY); dd.setDate(dd.getDate()+(i-ti));
+    return `<div class="wday"><div class="wday-lbl">${d}</div>
+      <div class="wday-num${i===ti?' today':''}">${dd.getDate()}</div></div>`;
+  }).join('');
+  const list=document.getElementById('cal-list');
+  const btn=document.getElementById('cal-add-btn');
+  const fmtApptDate = (d) => {
+    if(!d) return '';
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('it-IT',{weekday:'short',day:'2-digit',month:'short'});
+  };
+  if(appts.length===0){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">Nessun appuntamento.</div><button class="btn-primary" onclick="openModal('appt')" style="width:auto;padding:12px 24px">+ Nuovo appuntamento</button></div>`;
+    btn.style.display='none';
+  } else {
+    list.innerHTML=[...appts].sort((a,b)=>{
+      const da=(a.data||'9999')+a.time; const db=(b.data||'9999')+b.time; return da.localeCompare(db);
+    }).map(a=>`
+      <div class="card" style="display:flex;gap:12px;align-items:center">
+        <div style="background:rgba(45,74,138,.12);color:var(--cobalt);border-radius:8px;padding:8px 10px;font-weight:800;font-size:12px;min-width:60px;text-align:center;line-height:1.4">
+          ${a.time}<br/><span style="font-size:10px;font-weight:600;color:var(--steel)">${fmtApptDate(a.data)}</span>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:700">${a.client}</div>
+          <div style="font-size:12px;color:var(--steel)">${a.type}</div>
+        </div>
+        <span class="dot" style="background:${a.status==='confermato'?'var(--mint)':'var(--gold)'}"></span>
+        <button class="trash-btn" onclick="delAppt(${a.id})">🗑</button>
+      </div>`).join('');
+    btn.style.display='block';
+  }
+}
+function delAppt(id){showConfirm('Eliminare questo appuntamento?',()=>{appts=appts.filter(a=>a.id!==id);lsSave();renderCal();renderHome();showToast('Eliminato');})}
+function modalAppt(){
+  const today = new Date().toISOString().slice(0,10);
+  return`
+  <div class="modal-title">Nuovo Appuntamento</div>
+  <div class="form-group" id="dp-appt-wrap"><label class="form-label">Data *</label></div>
+  <div class="form-group"><label class="form-label">Orario</label><input class="form-input" type="time" id="m-time" value="09:00"/></div>
+  <div class="form-group"><label class="form-label">Cliente</label><input class="form-input" id="m-client" placeholder="Nome cliente"/></div>
+  <div class="form-group"><label class="form-label">Tipo</label>
+    <select class="form-input" id="m-type">
+      <option>Rinnovo RCA</option><option>Preventivo Vita</option><option>Preventivo Casa</option>
+      <option>Polizza Ufficio</option><option>Consulenza</option><option>Telefonata</option><option>Altro</option>
+    </select></div>
+  <div class="form-group"><label class="form-label">Stato</label>
+    <select class="form-input" id="m-status"><option value="confermato">Confermato</option><option value="attesa">In attesa</option></select></div>
+  <button class="btn-primary" onclick="saveAppt()">Salva</button>
+  <button class="btn-secondary" onclick="closeModal()">Annulla</button>`;}
+function saveAppt(){
+  const c=document.getElementById('m-client').value.trim();
+  const data=dpGet('appt');
+  if(!c){showToast('⚠️ Inserisci il nome del cliente');return;}
+  if(!data){showToast('⚠️ Seleziona la data');return;}
+  appts.push({id:nextId(appts),data:data,time:document.getElementById('m-time').value,client:c,type:document.getElementById('m-type').value,status:document.getElementById('m-status').value});
+  closeModal(); lsSave(); renderCal(); renderHome(); showToast('✅ Appuntamento aggiunto');
+}
+
+
+// ── TASKS ──────────────────────────────────────────────
+function renderTasks(){
+  const kpi=document.getElementById('task-kpi');
+  const tabs=document.getElementById('task-tabs');
+  const btn=document.getElementById('task-add-btn');
+  if(tasks.length===0){
+    kpi.style.display='none'; tabs.style.display='none'; btn.style.display='none';
+    document.getElementById('task-list').innerHTML=`<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">Nessuna attività.</div><button class="btn-primary" onclick="openModal('task')" style="width:auto;padding:12px 24px">+ Nuova attività</button></div>`;
+    return;
+  }
+  const done=tasks.filter(t=>t.done).length;
+  const high=tasks.filter(t=>!t.done&&t.priority==='alta').length;
+  kpi.style.display='grid'; tabs.style.display='flex'; btn.style.display='block';
+  kpi.innerHTML=`
+    <div class="card" style="margin-bottom:0;text-align:center"><div class="kpi-n" style="color:var(--mint)">${done}/${tasks.length}</div><div class="kpi-l">Completate</div></div>
+    <div class="card" style="margin-bottom:0;text-align:center"><div class="kpi-n" style="color:var(--danger)">${high}</div><div class="kpi-l">Alta priorità</div></div>`;
+  const pc={alta:'var(--danger)',media:'var(--amber)',bassa:'var(--steel)'};
+  const list=tasks.filter(t=>taskF==='tutti'?true:taskF==='attivi'?!t.done:t.done);
+  document.getElementById('task-list').innerHTML=list.length===0
+    ?`<div style="text-align:center;padding:24px;color:var(--steel);font-size:13px">Nessuna attività qui</div>`
+    :list.map(t=>`
+      <div class="task-row" style="opacity:${t.done?.55:1}">
+        <div class="task-check${t.done?' done':''}" onclick="toggleTask(${t.id})">${t.done?'<span style="color:#fff;font-size:12px">✓</span>':''}</div>
+        <div style="flex:1;font-size:14px;font-weight:600;text-decoration:${t.done?'line-through':'none'}">${t.text}</div>
+        ${badge(t.priority,pc[t.priority]||'var(--steel)')}
+        <button class="trash-btn" onclick="delTask(${t.id})">🗑</button>
+      </div>`).join('');
+}
+function taskFilter(f,el){taskF=f;document.querySelectorAll('#task-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderTasks();}
+function toggleTask(id){tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t);lsSave();renderTasks();renderHome();}
+function delTask(id){showConfirm('Eliminare questa attività?',()=>{tasks=tasks.filter(t=>t.id!==id);lsSave();renderTasks();renderHome();showToast('Eliminata');})}
+function modalTask(){return`
+  <div class="modal-title">Nuova Attività</div>
+  <div class="form-group"><label class="form-label">Descrizione</label><input class="form-input" id="m-text" placeholder="Cosa devi fare?"/></div>
+  <div class="form-group"><label class="form-label">Priorità</label>
+    <select class="form-input" id="m-prio"><option value="alta">Alta</option><option value="media">Media</option><option value="bassa">Bassa</option></select></div>
+  <button class="btn-primary" onclick="saveTask()">Salva</button>
+  <button class="btn-secondary" onclick="closeModal()">Annulla</button>`;}
+function saveTask(){
+  const t=document.getElementById('m-text').value.trim();
+  if(!t){showToast('⚠️ Inserisci una descrizione');return;}
+  tasks.push({id:nextId(tasks),text:t,priority:document.getElementById('m-prio').value,done:false});
+  closeModal(); lsSave(); renderTasks(); renderHome(); showToast('✅ Aggiunta');
+}
+
+// ── DEADLINES ──────────────────────────────────────────
+function renderDead(){
+  const btn=document.getElementById('dead-add-btn');
+  const tabs=document.getElementById('dead-tabs');
+  if(deadlines.length===0){
+    tabs.style.display='none'; btn.style.display='none';
+    document.getElementById('dead-list').innerHTML=`<div class="empty"><div class="empty-icon">🗓</div><div class="empty-text">Nessuna scadenza.</div><button class="btn-primary" onclick="openModal('dead')" style="width:auto;padding:12px 24px">+ Nuova scadenza</button></div>`;
+    return;
+  }
+  tabs.style.display='flex'; btn.style.display='block';
+  const list=[...deadlines].filter(d=>deadF==='tutti'||d.type===deadF).sort((a,b)=>a.days-b.days);
+  document.getElementById('dead-list').innerHTML=list.length===0
+    ?`<div style="text-align:center;padding:24px;color:var(--steel);font-size:13px">Nessuna scadenza qui</div>`
+    :list.map(d=>{
+      const col=d.days<=3?'var(--danger)':d.days<=7?'var(--amber)':'var(--mint)';
+      return `<div class="card" style="border-left:3px solid ${col};display:flex;align-items:center;gap:12px">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--steel);margin-bottom:3px">${DI[d.type]} ${d.type.toUpperCase()}</div>
+          <div style="font-size:15px;font-weight:700">${d.label}</div>
+        </div>
+        <div style="text-align:center;flex-shrink:0">
+          <div style="font-size:22px;font-weight:900;color:${col};line-height:1">${d.days}</div>
+          <div style="font-size:9px;color:var(--steel)">giorni</div>
+        </div>
+        <button class="trash-btn" onclick="delDead(${d.id})">🗑</button>
+      </div>`;}).join('');
+}
+function deadFilter(f,el){deadF=f;document.querySelectorAll('#dead-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderDead();}
+function delDead(id){showConfirm('Eliminare questa scadenza?',()=>{deadlines=deadlines.filter(d=>d.id!==id);lsSave();renderDead();renderHome();showToast('Eliminata');})}
+function modalDead(){return`
+  <div class="modal-title">Nuova Scadenza</div>
+  <div class="form-group"><label class="form-label">Descrizione</label><input class="form-input" id="m-dlabel" placeholder="Es. Rinnovo RCA – Rossi"/></div>
+  <div class="form-group"><label class="form-label">Giorni alla scadenza</label><input class="form-input" type="number" min="1" id="m-ddays" placeholder="30"/></div>
+  <div class="form-group"><label class="form-label">Tipo</label>
+    <select class="form-input" id="m-dtype">
+      <option value="rinnovo">Rinnovo</option><option value="preventivo">Preventivo</option>
+      <option value="normativa">Normativa</option><option value="pratica">Pratica</option>
+    </select></div>
+  <button class="btn-primary" onclick="saveDead()">Salva</button>
+  <button class="btn-secondary" onclick="closeModal()">Annulla</button>`;}
+function saveDead(){
+  const l=document.getElementById('m-dlabel').value.trim();
+  const d=parseInt(document.getElementById('m-ddays').value);
+  if(!l||!d){showToast('⚠️ Compila tutti i campi');return;}
+  deadlines.push({id:nextId(deadlines),label:l,days:d,type:document.getElementById('m-dtype').value});
+  closeModal(); lsSave(); renderDead(); renderHome(); showToast('✅ Scadenza aggiunta');
+}
+
+// ── POLIZZE ────────────────────────────────────────────
+function renderPol(){
+  const tabs=document.getElementById('pol-tabs');
+  const btn=document.getElementById('pol-add-btn');
+  if(polizze.length===0){
+    tabs.style.display='none'; btn.style.display='none';
+    document.getElementById('pol-list').innerHTML=`<div class="empty"><div class="empty-icon">🛡</div><div class="empty-text">Nessuna polizza personale.\nAggiungine una!</div><button class="btn-primary" onclick="openModal('pol')" style="width:auto;padding:12px 24px">+ Aggiungi polizza</button></div>`;
+    return;
+  }
+  tabs.style.display='flex'; btn.style.display='block';
+  const list=polizze.filter(p=>polF==='tutte'||p.tipo===polF);
+  document.getElementById('pol-list').innerHTML=list.length===0
+    ?`<div style="text-align:center;padding:24px;color:var(--steel);font-size:13px">Nessuna polizza in questa categoria</div>`
+    :list.map(p=>{
+      const dl=daysLeft(p.scadenza);
+      const col=dl<=7?'var(--danger)':dl<=30?'var(--amber)':'var(--cobalt)';
+      const uc=dl<=7?'var(--danger)':dl<=30?'var(--amber)':'var(--mint)';
+      const rata=(p.premio/(FD[p.frazionamento]||1)).toFixed(2);
+      const statBadge=dl<0?badge('SCADUTA','var(--danger)'):dl<=7?badge('URGENTE','var(--danger)'):dl<=30?badge('IN SCADENZA','var(--amber)'):badge('ATTIVA','var(--mint)');
+      return `<div class="pol-card" style="border-left:4px solid ${col}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div>
+            <div style="font-size:11px;color:var(--steel);margin-bottom:3px">${PI[p.tipo]} ${p.tipo.toUpperCase()}</div>
+            <div style="font-size:16px;font-weight:800">${p.compagnia}</div>
+            <div style="font-size:12px;color:var(--steel)">${p.numero}</div>
+          </div>${statBadge}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:10px">
+          <div><span style="color:var(--steel)">Assicurato</span><br/><b>${p.assicurato||'—'}</b></div>
+          <div><span style="color:var(--steel)">Scadenza</span><br/><b style="color:${uc}">${fmtDate(p.scadenza)}</b></div>
+          <div><span style="color:var(--steel)">Premio annuo</span><br/><b>€ ${parseFloat(p.premio).toLocaleString('it-IT')}</b></div>
+          <div><span style="color:var(--steel)">Frazionamento</span><br/><b>${FL[p.frazionamento]||p.frazionamento}</b></div>
+          <div><span style="color:var(--steel)">Rata</span><br/><b>€ ${parseFloat(rata).toLocaleString('it-IT',{minimumFractionDigits:2})}</b></div>
+          ${p.targa?`<div><span style="color:var(--steel)">Targa</span><br/><b>${p.targa}</b></div>`:''}
+        </div>
+        ${p.note?`<div style="font-size:12px;color:var(--steel);padding:8px;background:var(--cream);border-radius:8px;margin-bottom:10px">${p.note}</div>`:''}
+        ${dl>=0&&dl<=30?`<div style="background:${dl<=7?'rgba(192,57,43,.1)':'rgba(240,165,0,.1)'};border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:${dl<=7?'var(--danger)':'var(--amber)'};margin-bottom:10px">${dl<=7?'🔴':'🟡'} Scade tra ${dl} giorni — ${dl<=7?'Rinnova subito!':'Programma il rinnovo'}</div>`:''}
+        <div style="display:flex;gap:8px">
+          <button onclick="delPol(${p.id})" style="flex:1;background:transparent;color:var(--danger);border:1.5px solid var(--danger);border-radius:10px;padding:9px;font-size:13px;font-weight:700;cursor:pointer">🗑 Elimina</button>
+          <button onclick="editPol(${p.id})" style="flex:1;background:var(--cobalt);color:#fff;border:none;border-radius:10px;padding:9px;font-size:13px;font-weight:700;cursor:pointer">✏ Modifica</button>
+        </div>
+      </div>`;}).join('');
+  buildNav();
+}
+function polFilter(f,el){polF=f;document.querySelectorAll('#pol-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderPol();}
+function delPol(id){showConfirm('Eliminare questa polizza?',()=>{polizze=polizze.filter(p=>p.id!==id);lsSave();renderPol();renderHome();showToast('Eliminata');})}
+function editPol(id){polEditId=id;openModal('pol',polizze.find(p=>p.id===id));}
+function modalPol(p){
+  const isEdit=!!p;
+  return `<div class="modal-title">${isEdit?'Modifica Polizza':'Nuova Polizza'}</div>
+  <div class="form-group"><label class="form-label">Tipo polizza</label>
+    <select class="form-input" id="m-ptipo">
+      <option value="auto"${p&&p.tipo==='auto'?' selected':''}>🚗 Auto</option>
+      <option value="vita"${p&&p.tipo==='vita'?' selected':''}>💚 Vita</option>
+      <option value="casa"${p&&p.tipo==='casa'?' selected':''}>🏠 Casa</option>
+      <option value="altro"${p&&p.tipo==='altro'?' selected':''}>📋 Altro</option>
+    </select></div>
+  <div class="form-group"><label class="form-label">Compagnia *</label><input class="form-input" id="m-pcomp" placeholder="Es. Generali Italia" value="${p?p.compagnia:''}"/></div>
+  <div class="form-group"><label class="form-label">Numero polizza</label><input class="form-input" id="m-pnum" value="${p?p.numero:''}"/></div>
+  <div class="form-group"><label class="form-label">Assicurato</label><input class="form-input" id="m-pass" value="${p?p.assicurato:((profile.nome+' '+profile.cognome).trim())}"/></div>
+  <div class="form-group" id="dp-scad-wrap"><label class="form-label">Data scadenza *</label></div>
+  <div class="form-group"><label class="form-label">Premio annuo € *</label><input class="form-input" type="number" min="0" step="0.01" id="m-pprem" value="${p?p.premio:''}"/></div>
+  <div class="form-group"><label class="form-label">Frazionamento</label>
+    <select class="form-input" id="m-pfrazi">
+      <option value="annuale"${p&&p.frazionamento==='annuale'?' selected':''}>Annuale (1 rata)</option>
+      <option value="semestrale"${p&&p.frazionamento==='semestrale'?' selected':''}>Semestrale (2 rate)</option>
+      <option value="trimestrale"${p&&p.frazionamento==='trimestrale'?' selected':''}>Trimestrale (4 rate)</option>
+      <option value="mensile"${p&&p.frazionamento==='mensile'?' selected':''}>Mensile (12 rate)</option>
+    </select></div>
+  <div class="form-group"><label class="form-label">Targa (solo auto)</label><input class="form-input" id="m-ptarga" value="${p&&p.targa?p.targa:''}" oninput="this.value=this.value.toUpperCase()"/></div>
+  <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="m-pnote" value="${p&&p.note?p.note:''}"/></div>
+  <button class="btn-primary" onclick="savePol()">${isEdit?'Aggiorna':'Aggiungi polizza'}</button>
+  <button class="btn-secondary" onclick="closeModal()">Annulla</button>`;}
+function savePol(){
+  const comp=document.getElementById('m-pcomp').value.trim();
+  const scad=dpGet('scad');
+  const prem=parseFloat(document.getElementById('m-pprem').value);
+  if(!comp||!scad||!prem){showToast('⚠️ Compila i campi obbligatori (*)');return;}
+  const pol={tipo:document.getElementById('m-ptipo').value,compagnia:comp,
+    numero:document.getElementById('m-pnum').value,
+    assicurato:document.getElementById('m-pass').value,
+    scadenza:scad,premio:prem,
+    frazionamento:document.getElementById('m-pfrazi').value,
+    targa:document.getElementById('m-ptarga').value.toUpperCase(),
+    note:document.getElementById('m-pnote').value};
+  if(polEditId){polizze=polizze.map(p=>p.id===polEditId?{...pol,id:polEditId}:p);polEditId=null;}
+  else polizze.push({...pol,id:nextId(polizze)});
+  closeModal(); lsSave(); renderPol(); renderHome(); showToast(polEditId?'✅ Aggiornata':'✅ Polizza aggiunta');
+}
+
+// ── NEWS con RSS reale ─────────────────────────────────
+const RSS_SOURCES = [
+  {url:'https://api.rss2json.com/v1/api.json?count=6&rss_url='+encodeURIComponent('https://www.assinews.it/feed/'), label:'Assinews', tag:'Mercato'},
+  {url:'https://api.rss2json.com/v1/api.json?count=4&rss_url='+encodeURIComponent('https://www.intermediachannel.it/feed/'), label:'Intermedia Channel', tag:'Mercato'},
+  {url:'https://api.rss2json.com/v1/api.json?count=4&rss_url='+encodeURIComponent('https://www.insuranceup.it/feed/'), label:'InsuranceUp', tag:'Trend'},
+  {url:'https://api.rss2json.com/v1/api.json?count=4&rss_url='+encodeURIComponent('https://news.google.com/rss/search?q=IVASS+assicurazioni&hl=it&gl=IT&ceid=IT:it'), label:'IVASS / Normativa', tag:'Normativa'},
+  {url:'https://api.rss2json.com/v1/api.json?count=4&rss_url='+encodeURIComponent('https://news.google.com/rss/search?q=polizze+assicurazioni+Italia&hl=it&gl=IT&ceid=IT:it'), label:'Google News Assicurazioni', tag:'Mercato'},
+];
+
+let liveNews = [];
+let newsLoading = false;
+
+async function fetchNews(manual) {
+  if(newsLoading) return;
+  newsLoading = true;
+  const btn = document.getElementById('news-refresh-btn');
+  if(btn){btn.textContent='⏳ Caricamento...';btn.disabled=true;}
+  document.getElementById('news-list').innerHTML =
+    '<div style="text-align:center;padding:40px 20px"><div style="font-size:36px;margin-bottom:12px">⏳</div><div style="font-size:14px;color:var(--steel)">Recupero news in corso...</div></div>';
+  try {
+    const results = await Promise.all(RSS_SOURCES.map(async s=>{
+      try{
+        const r = await fetch(s.url, {signal:AbortSignal.timeout(8000)});
+        if(!r.ok) return [];
+        const d = await r.json();
+        if(d.status!=='ok') return [];
+        return d.items.map(item=>({
+          id:'n_'+Math.abs(item.link?item.link.split('').reduce((a,c)=>a+c.charCodeAt(0),0):Math.random()*99999|0),
+          title:item.title||'',
+          summary:(item.description||'').replace(/<[^>]+>/g,'').slice(0,200),
+          source:s.label,
+          link:item.link||'',
+          date:item.pubDate?new Date(item.pubDate).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}):'recente',
+          tag:s.tag,
+        }));
+      }catch(e){return [];}
+    }));
+    const fetched = results.flat();
+    if(fetched.length>0){
+      const savedIds = new Set(savedNews.map(n=>n.id));
+      liveNews = fetched.map(n=>({...n,saved:savedIds.has(n.id)}));
+      try{localStorage.setItem('ap_liveNews',JSON.stringify(liveNews));localStorage.setItem('ap_newsTs',Date.now());}catch(e){}
+      if(manual) showToast('✅ '+fetched.length+' news aggiornate');
+    } else {
+      try{const c=localStorage.getItem('ap_liveNews');if(c)liveNews=JSON.parse(c);}catch(e){}
+      if(manual) showToast('⚠️ Connessione assente, mostro ultime news salvate');
+    }
+  } catch(e){
+    try{const c=localStorage.getItem('ap_liveNews');if(c)liveNews=JSON.parse(c);}catch(e2){}
+    if(manual) showToast('⚠️ Errore connessione');
+  }
+  newsLoading=false;
+  if(btn){btn.textContent='🔄 Aggiorna';btn.disabled=false;}
+  const ts=document.getElementById('news-last-update');
+  if(ts) ts.textContent='Aggiornato: '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  renderNews();
+}
+
+function renderNews(){
+  const el=document.getElementById('news-list');
+  if(!el) return;
+  const list = newsF==='Salvate' ? savedNews : liveNews;
+  if(newsF==='Salvate'&&savedNews.length===0){
+    el.innerHTML='<div class="empty"><div class="empty-icon">⭐</div><div class="empty-text">Nessuna news salvata.\nTocca ☆ su un articolo per salvarlo.</div></div>';
+    return;
+  }
+  if(list.length===0){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📰</div><div class="empty-text">Tocca Aggiorna per caricare\nle ultime news del settore.</div><button class="btn-primary" onclick="fetchNews(true)" style="width:auto;padding:12px 24px;margin-top:8px">🔄 Carica news</button></div>';
+    return;
+  }
+  el.innerHTML=list.map(n=>{
+    const sv=savedNews.some(s=>s.id===n.id);
+    const tc=n.tag==='Normativa'?'var(--cobalt)':n.tag==='Trend'?'var(--gold)':'var(--mint)';
+    return '<div style="background:var(--paper);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'+
+        '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">'+
+          '<span class="badge" style="background:'+tc+'18;color:'+tc+';border:1px solid '+tc+'40">'+n.tag+'</span>'+
+          '<span style="font-size:11px;color:var(--steel)">'+n.source+'</span>'+
+        '</div>'+
+        '<span onclick="toggleNewsave(''+n.id+'')" style="font-size:22px;cursor:pointer;flex-shrink:0;user-select:none">'+(sv?'⭐':'☆')+'</span>'+
+      '</div>'+
+      '<div style="font-size:14px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:6px">'+n.title+'</div>'+
+      (n.summary?'<div style="font-size:12px;color:var(--steel);line-height:1.5;margin-bottom:8px">'+n.summary+'</div>':'')+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<span style="font-size:11px;color:var(--steel)">📅 '+n.date+'</span>'+
+        (n.link?'<button onclick="window.open(''+n.link+'','_blank','noopener,noreferrer')" style="background:var(--cobalt);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer">Leggi →</button>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function newsFilter(f,el){
+  newsF=f;
+  document.querySelectorAll('#s5 .tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderNews();
+}
+
+function toggleNewsave(id){
+  const n=liveNews.find(x=>x.id==id)||savedNews.find(x=>x.id==id);
+  if(!n) return;
+  if(savedNews.some(s=>s.id==id)){
+    savedNews=savedNews.filter(s=>s.id!=id);
+    liveNews=liveNews.map(x=>x.id==id?{...x,saved:false}:x);
+    showToast('Rimosso dai salvati');
+  } else {
+    savedNews.push({...n,saved:true});
+    liveNews=liveNews.map(x=>x.id==id?{...x,saved:true}:x);
+    showToast('⭐ Salvato');
+  }
+  lsSave();renderNews();renderHome();
+}
+
+// ── SETTINGS ───────────────────────────────────────────
+function renderSettings(){
+  // inject datepicker for dob
+  const wrap=document.getElementById('dp-dob-wrap');
+  wrap.innerHTML='<label class="form-label">Data di Nascita</label>'+dpHtml('dob',profile.dob||'',1930,new Date().getFullYear()-18);
+  // fill fields
+  ['nome','cognome','lob','cf','piva','rui','email','tel','addr','agenzia','mandato'].forEach(k=>{
+    const el=document.getElementById('p-'+k); if(el) el.value=profile[k]||'';
+  });
+  document.getElementById('p-ruisez').value=profile.ruiSez||'';
+  document.getElementById('p-role').value=profile.role||'';
+  updateProfilePreview();
+}
+function updateProfilePreview(){
+  const nome=(document.getElementById('p-nome')||{}).value||profile.nome||'';
+  const cognome=(document.getElementById('p-cognome')||{}).value||profile.cognome||'';
+  const role=(document.getElementById('p-role')||{}).value||profile.role||'';
+  const rui=(document.getElementById('p-rui')||{}).value||profile.rui||'';
+  const ruiSez=(document.getElementById('p-ruisez')||{}).value||profile.ruiSez||'';
+  const ini=((nome[0]||'G')+(cognome[0]||'')).toUpperCase();
+  document.getElementById('prof-avatar').textContent=ini||'G';
+  document.getElementById('prof-name').textContent=(nome+' '+cognome).trim()||'Il tuo nome';
+  document.getElementById('prof-role').textContent=role||'Agente di Assicurazione';
+  document.getElementById('prof-rui').textContent=rui?('RUI '+ruiSez+' – '+rui):'';
+}
+function saveProfile(){
+  profile={
+    nome:document.getElementById('p-nome').value,
+    cognome:document.getElementById('p-cognome').value,
+    dob:dpGet('dob'),
+    lob:document.getElementById('p-lob').value,
+    cf:document.getElementById('p-cf').value.toUpperCase(),
+    piva:document.getElementById('p-piva').value,
+    rui:document.getElementById('p-rui').value,
+    ruiSez:document.getElementById('p-ruisez').value,
+    role:document.getElementById('p-role').value,
+    agenzia:document.getElementById('p-agenzia').value,
+    mandato:document.getElementById('p-mandato').value,
+    email:document.getElementById('p-email').value,
+    tel:document.getElementById('p-tel').value,
+    addr:document.getElementById('p-addr').value,
+  };
+  renderHome(); lsSave(); showToast('✅ Profilo salvato');
+}
+function toggleNotif(id){
+  const el=document.getElementById(id);
+  const on=el.style.background==='var(--cobalt)'||el.style.background==='rgb(45, 74, 138)';
+  el.style.background=on?'var(--border)':'var(--cobalt)';
+  el.querySelector('.toggle-knob').style.left=on?'2px':'22px';
+}
+
+// ── INIT ───────────────────────────────────────────────
+buildNav();
+renderHome();
+renderCal();
+renderTasks();
+renderDead();
+renderPol();
+// Carica cache news subito, poi aggiorna dal web
+try{const c=localStorage.getItem('ap_liveNews');if(c){liveNews=JSON.parse(c);}}catch(e){}
+renderNews();
+// Aggiorna dal web solo se passata più di 1 ora dall'ultimo fetch
+const lastTs = parseInt(localStorage.getItem('ap_newsTs')||'0');
+if(Date.now()-lastTs > 3600000) fetchNews(false);
+renderSettings();
+</script>
+</body>
+</html>
